@@ -88,6 +88,17 @@ void triton::UseAnalysis::visitOperation(Operation *op,
         for (auto operand : operands)
           propagateUse(operand, UseType::DataUse);
       })
+      .Case<triton::ascend::UnstructuredLoadOp>([&](auto load) {
+        propagateUse(operands[0], UseType::MetaUse);
+        propagateUse(operands[1], UseType::DataUse);
+        auto mask = load.getMask();
+        if (mask) {
+          propagateUse(operands[2], UseType::DataUse);
+          if (load.getOther()) {
+            propagateUse(operands[3], UseType::DataUse);
+          }
+        }
+      })
       .Case<triton::AssertOp>(
           [&](auto assert) { propagateUse(operands[0], UseType::DataUse); })
       .Case<triton::StoreOp>([&](auto store) {
@@ -100,15 +111,13 @@ void triton::UseAnalysis::visitOperation(Operation *op,
           propagateUse(operands[2], UseType::MetaUse);
         }
       })
-      .Case<triton::ascend::IndirectStoreOp>([&](auto store) {
+      .Case<triton::ascend::UnstructuredStoreOp>([&](auto store) {
         propagateUse(operands[0], UseType::MetaUse);
-        propagateUse(operands[1], UseType::MetaUse);
+        propagateUse(operands[1], UseType::DataUse);
         propagateUse(operands[2], UseType::DataUse);
-        auto value = store.getValue();
         auto mask = store.getMask();
         if (mask) {
-          assert(mask != value && "mask and data cannot be the same");
-          propagateUse(operands[3], UseType::MetaUse);
+          propagateUse(operands[3], UseType::DataUse);
         }
       })
       // Consider triton::AtomicRMWOp as store operation
@@ -173,26 +182,26 @@ void triton::UseAnalysis::visitOperation(Operation *op,
 
 void setMixUseRecursively(Operation *rootOp, bool applyRoot = true) {
   traverseBackwardUpdateOperandChainIf(
-      rootOp,
-      // ConditionFn
-      [rootOp, applyRoot](Operation *curOp) {
-        for (auto res : curOp->getResults()) {
-          auto tensorType = dyn_cast<RankedTensorType>(res.getType());
-          if (tensorType &&
-              isa<triton::PointerType>(tensorType.getElementType()))
-            return false;
-        }
-        return isMetaUse(curOp) && (curOp != rootOp || applyRoot);
-      },
-      // StopFn
-      [rootOp](Operation *curOp) {
-        return isa<triton::LoadOp>(curOp) && curOp != rootOp;
-      },
-      // ActionFn
-      [](OpBuilder &b, Operation *op) {
-        LLVM_DEBUG({ op->setAttr("MixUse", UnitAttr::get(b.getContext())); });
-        op->removeAttr("MetaUse");
-      });
+    rootOp,
+    // ConditionFn
+    [rootOp, applyRoot](Operation *curOp) {
+      for (auto res : curOp->getResults()) {
+        auto tensorType = dyn_cast<RankedTensorType>(res.getType());
+        if (tensorType && isa<triton::PointerType>(tensorType.getElementType()))
+          return false;
+      }
+      return isMetaUse(curOp) && (curOp != rootOp || applyRoot);
+    },
+    // StopFn
+    [rootOp](Operation *curOp) {
+      return (isa<triton::LoadOp>(curOp) ||
+              isa<triton::ascend::UnstructuredLoadOp>(curOp)) && curOp != rootOp;
+    },
+    // ActionFn
+    [](OpBuilder &b, Operation *op) {
+      LLVM_DEBUG({ op->setAttr("MixUse", UnitAttr::get(b.getContext())); });
+      op->removeAttr("MetaUse");
+    });
 }
 
 static void setMixUseFromValue(Value v) {
@@ -376,6 +385,14 @@ LogicalResult triton::runUseAnalysis(triton::FuncOp &funcOp) {
                 metaUsers.insert(user);
               }
             })
+            .Case<triton::ascend::UnstructuredLoadOp>([&](auto unstrucLoad) {
+              auto base = unstrucLoad.getBase();
+              auto indices = unstrucLoad.getIndices();
+              auto mask = unstrucLoad.getMask();
+              auto other = unstrucLoad.getOther();
+              if (result == base || result == indices || result == mask || result == other)
+                metaUsers.insert(user);
+            })
             .Case<triton::StoreOp>([&](auto store) {
               auto ptr = store.getPtr();
               auto mask = store.getMask();
@@ -383,13 +400,12 @@ LogicalResult triton::runUseAnalysis(triton::FuncOp &funcOp) {
                 metaUsers.insert(user);
               }
             })
-            .Case<triton::ascend::IndirectStoreOp>([&](auto indirectstore) {
-              auto src = indirectstore.getSrc();
-              auto offset = indirectstore.getOffsets();
-              auto mask = indirectstore.getMask();
-              if (result == src || result == offset || result == mask) {
+            .Case<triton::ascend::UnstructuredStoreOp>([&](auto unstrucStore) {
+              auto base = unstrucStore.getBase();
+              auto indices = unstrucStore.getIndices();
+              auto mask = unstrucStore.getMask();
+              if (result == base || result == indices || result == mask)
                 metaUsers.insert(user);
-              }
             })
             .Case<triton::AtomicRMWOp>([&](auto atomicOp) {
               auto ptr = atomicOp.getPtr();
@@ -476,8 +492,7 @@ LogicalResult triton::runUseAnalysis(triton::FuncOp &funcOp) {
     // We first trace from the 1st load to the 2nd load with the ops between
     // them marked as MixUse. Then we traceback from the 2nd load to mark defs
     // MixUse.
-    if (opIsIndirectLoad(op) || opIsIndirectCalc(op) ||
-        isa<triton::ascend::IndirectStoreOp>(op)) {
+    if (opIsIndirectLoad(op) || opIsIndirectCalc(op)) {
       LLVM_DEBUG({
         os << "[UseAnalysis] Found indirect load interface op: " << *op << "\n";
       });
@@ -499,8 +514,9 @@ LogicalResult triton::runUseAnalysis(triton::FuncOp &funcOp) {
             // so that they will be replaced instead of be erased without
             // conversion.
             return (isa<triton::LoadOp>(curOp) || isa<triton::StoreOp>(curOp) ||
-                    isa<triton::ascend::IndirectStoreOp>(curOp)) &&
-                   !isMetaUse(curOp);
+                    isa<triton::ascend::UnstructuredLoadOp>(curOp) ||
+                    isa<triton::ascend::UnstructuredStoreOp>(curOp))
+                    && !isMetaUse(curOp);
           },
           /*actionFn*/
           [](OpBuilder &b, Operation *op) { setMixUseRecursively(op); },
