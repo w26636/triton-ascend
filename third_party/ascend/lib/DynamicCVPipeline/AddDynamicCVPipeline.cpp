@@ -25,6 +25,7 @@
 #include "ascend/include/DynamicCVPipeline/Passes.h"
 #include "ascend/include/DynamicCVPipeline/PlanComputeBlockPass.h"
 #include "ascend/include/DynamicCVPipeline/SplitDataflowPass.h"
+#include "ascend/include/DynamicCVPipeline/AddControlFlowCondition.h"
 
 static constexpr const char *DEBUG_TYPE = "AddDynamicCVPipeline";
 #define DBGS() (llvm::dbgs() << '[' << DEBUG_TYPE << "] ")
@@ -60,6 +61,7 @@ void AddDynamicCVPipelinePass::runOnOperation()
     // todo: add related passes.
     pm.addPass(createPlanComputeBlockPass());
     pm.addPass(createSplitDataflowPass());
+    pm.addPass(createAddControlFlowConditionPass());
 
     if (failed(runPipeline(pm, getOperation()))) {
         moduleOp->emitError() << "[" << DEBUG_TYPE << "] Pass failed!";
