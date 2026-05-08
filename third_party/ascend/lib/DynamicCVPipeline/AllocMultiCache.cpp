@@ -21,13 +21,19 @@
  */
 
 #include "ascend/include/DynamicCVPipeline/AllocMultiCache.h"
+#include "ascend/include/DynamicCVPipeline/AllocMultiCache/AddMultiBufferInnerScope.h"
 
 #include "mlir/Pass/PassManager.h"
 #include "llvm/Support/Debug.h"
 
 static constexpr const char *DEBUG_TYPE = "AllocMultiCache";
 #define DBGS() (llvm::dbgs() << '[' << DEBUG_TYPE << "] ")
-#define LDBG(X) LLVM_DEBUG(DBGS() << (X) << "\n")
+#define LDBG(...) \
+LLVM_DEBUG({ \
+  DBGS(); \
+  llvm::outs() << __VA_ARGS__; \
+  llvm::outs() << "\n"; \
+})
 
 using namespace mlir;
 using namespace triton;
@@ -38,19 +44,19 @@ void AllocMultiCachePass::runOnOperation()
     ModuleOp module = getOperation();
     OpPassManager pm(module.getOperationName());
     LDBG("Enter pass.");
+    LDBG(llvm::StringRef("before innerscope:\n") << module << "\n");
+    // Step 1:Inner multibuffer
+    pm.addPass(createAddMultiBufferInnerScopePass());
 
-    // Step 1: Walk scope operations
-
-    // Step 2: Find main loop in each scope
-
-    // Step 3: Apply inner multi-buffer optimization
+    // Step 2: Outer multibuffer
 
     if (failed(runPipeline(pm, module))) {
         module->emitError() << "[" << DEBUG_TYPE << "] Pass failed!";
         signalPassFailure();
     }
-
+    
     LDBG("Process successfully");
+    LDBG(llvm::StringRef("after innerscope:\n") << module << "\n");
 }
 
 namespace mlir {

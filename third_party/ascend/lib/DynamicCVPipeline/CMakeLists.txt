@@ -6,12 +6,16 @@ file(GLOB SPLIT_DATAFLOW_SRC_FILES CONFIGURE_DEPENDS
     "SplitDataflow/*.cpp"
 )
 
-file(GLOB ADD_CONTROLFLOW_CONDITION_SRC_FILES CONFIGURE_DEPENDS
- 	     "AddControlFlowCondition/*.cpp"
-)
-
 file(GLOB SEPARATE_MEMORY_FROM_COMPUTE_SRC_FILES CONFIGURE_DEPENDS
   "SeparateMemoryFromCompute/*.cpp"
+)
+
+file(GLOB ALLOC_MULTI_CACHE_SRCS_FILES CONFIGURE_DEPENDS 
+  "AllocMultiCache/*.cpp"
+)
+
+file(GLOB ADD_CONTROLFLOW_CONDITION_SRC_FILES CONFIGURE_DEPENDS
+ 	     "AddControlFlowCondition/*.cpp"
 )
 
 add_triton_library(DynamicCVPipeline
