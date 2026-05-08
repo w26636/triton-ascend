@@ -42,6 +42,7 @@ struct ControlFlowConditionInfo {
   llvm::DenseMap<Value, SmallVector<Value>> crossCoreDependentMap;
   llvm::DenseMap<scf::ForOp, llvm::DenseMap<Value, SmallVector<Value>>> intraCoreDependentMap;
 
+  // unique counter value for each ifblock
   llvm::DenseMap<scf::IfOp, Value> cntArgs;
 };
 

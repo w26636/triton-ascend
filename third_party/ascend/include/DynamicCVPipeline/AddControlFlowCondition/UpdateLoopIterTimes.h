@@ -35,6 +35,13 @@
 namespace mlir {
 namespace triton {
 
+  // Loop iteration times info
+struct IterationTimesInfo {
+  int ifCount = 0;           // Number of if operations
+  int requiredBuffers = 1;   // Number of required buffers
+  int x = 1;                 // Number of producer buffers
+  SmallVector<scf::IfOp> ifOpsInThisFor; // If operations in this loop
+};
 
 class UpdateLoopIterTimesPass
     : public PassWrapper<UpdateLoopIterTimesPass, OperationPass<ModuleOp>> {
@@ -46,6 +53,45 @@ public:
 private:
   ControlFlowConditionInfo *info = nullptr;
 
+  int GetMainLoopIdToLoopOpMap(ModuleOp module,
+                                DenseMap<int, SmallVector<Operation *>> &cmap,
+                                DenseMap<int, SmallVector<Operation *>> &vmap);
+
+  int ComputeMainLoopTimes(DenseMap<int, SmallVector<Operation *>> &loopMap,
+                            DenseMap<Operation *, IterationTimesInfo> &infoMap);
+
+  int UpdateForLoopIteration(DenseMap<int, SmallVector<Operation *>> &cmap,
+                              DenseMap<int, SmallVector<Operation *>> &vmap,
+                              DenseMap<Operation *, IterationTimesInfo> &infoMap);
+
+  int collectForOpsAndUpdateMax(DenseMap<int, SmallVector<Operation *>> &map,
+                                  int id,
+                                  SmallVector<Operation *> &allForOps,
+                                  int &maxIfCount,
+                                  int &maxRequiredBuffers,
+                                  int &maxX,
+                                  DenseMap<Operation *, IterationTimesInfo> &infoMap);
+
+  int replaceForOpCounterInIfOps();
+
+  // Calculate factor = requiredBuffers / x
+  std::pair<int, int> calculateFactor(scf::ForOp forOp);
+
+  // Extend for loop iteration count
+  scf::ForOp extendForOpIterationCount(scf::ForOp oldForOp, int ifCount,
+                                       int requiredBuffers, int x,
+                                       IRMapping &mapper,
+                                       SmallVector<scf::IfOp> &ifOpsInThisFor);
+
+  Value computeNewLoopUpperBound(OpBuilder &builder, Location loc, scf::ForOp forOp,
+                                int ifCount, int requiredBuffers, int x);
+
+  scf::ForOp cloneForOpWithNewUpperBound(OpBuilder &builder, Location loc,
+                                          scf::ForOp oldForOp, Value newUpperBound,
+                                          IRMapping &mapper);
+
+  int updateCntArgsAfterClone(scf::ForOp oldForOp, IRMapping &mapper,
+                               SmallVector<scf::IfOp> &ifOpsInThisFor);
 };
 
 std::unique_ptr<OperationPass<ModuleOp>> createUpdateLoopIterTimesPass();
