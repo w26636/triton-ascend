@@ -25,6 +25,7 @@
 #include "ascend/include/DynamicCVPipeline/AddControlFlowCondition/CreateIfOps.h"
 #include "ascend/include/DynamicCVPipeline/AddControlFlowCondition/UpdateConditionInfo.h"
 #include "third_party/ascend/include/DynamicCVPipeline/AddControlFlowCondition/InitDependentMap.h"
+#include "ascend/include/DynamicCVPipeline/AddControlFlowCondition/ProcessArgs.h"
 #include "ascend/include/DynamicCVPipeline/AddControlFlowCondition/UpdateForOps.h"
 #include "ascend/include/DynamicCVPipeline/AddControlFlowCondition/UpdateLoopIterTimes.h"
 #include "bishengir/Dialect/HIVM/IR/HIVM.h"
@@ -108,28 +109,31 @@ void AddControlFlowConditionPass::runOnOperation()
   std::unique_ptr<InitDependentMapPass> initDependentMapPass(new InitDependentMapPass());
   initDependentMapPass->setConditionInfo(&info);
   pm.addPass(std::move(initDependentMapPass));
+  
+  // Step1: Process shared iter_args in for ops to eliminate arg sharing across block_ids
+  pm.addPass(createProcessArgsPass());
 
-  // Step1: Clone ops in vector/cube to ensure that each block_id has its own
+  // Step2: Clone ops in vector/cube to ensure that each block_id has its own
   // ops without sharing
   pm.addPass(createCloneOpsPass());
 
-  // Step2: Create if ops based on block_id
+  // Step3: Create if ops based on block_id
   std::unique_ptr<CreateIfOpsPass> createIfOpsPass(new CreateIfOpsPass());
   createIfOpsPass->setConditionInfo(&info);
   pm.addPass(std::move(createIfOpsPass));
 
-  // Step3: Update for ops with block counters and inner dependency conditions,
+  // Step4: Update for ops with block counters and inner dependency conditions,
   // and insert PIPE_S inter-core synchronization
   std::unique_ptr<UpdateForOpsPass> updateForOpsPass(new UpdateForOpsPass());
   updateForOpsPass->setConditionInfo(&info);
   pm.addPass(std::move(updateForOpsPass));
 
-  // Step4:Update the conditions of ifOp based on the intraCoreDependentMap and crossCoreDependentMap
+  // Step5:Update the conditions of ifOp based on the intraCoreDependentMap and crossCoreDependentMap
   auto updatePass = std::make_unique<UpdateConditionInfoPass>();
   updatePass->setConditionInfo(&info);
   pm.addPass(std::move(updatePass));
 
-  // Step5: Update for loop iteration times based on intraCoreDependentMap
+  // Step6: Update for loop iteration times based on intraCoreDependentMap
   std::unique_ptr<UpdateLoopIterTimesPass> updateLoopIterTimesPass(new UpdateLoopIterTimesPass());
   updateLoopIterTimesPass->setConditionInfo(&info);
   pm.addPass(std::move(updateLoopIterTimesPass));
@@ -154,6 +158,7 @@ void registerAddControlFlowConditionPasses()
 {
     registerPass(createCloneOpsPass);
     registerPass(createCreateIfOpsPass);
+    registerPass(createProcessArgsPass);
     registerPass(createUpdateForOpsPass);
     registerPass(createAddControlFlowConditionPass);
 }
