@@ -63,6 +63,7 @@ void AddDynamicCVPipelinePass::runOnOperation()
 
     // todo: add related passes.
     pm.addPass(createPlanComputeBlockPass());
+    pm.addPass(createComputeBlockOptPass());
     pm.addPass(createSplitDataflowPass());
     pm.addPass(createSeparateMemoryFromComputePass());
     pm.addPass(createAllocMultiCachePass());

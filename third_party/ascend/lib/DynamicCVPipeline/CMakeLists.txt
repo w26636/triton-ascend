@@ -19,11 +19,17 @@ file(GLOB ADD_CONTROLFLOW_CONDITION_SRC_FILES CONFIGURE_DEPENDS
     "AddControlFlowCondition/*.cpp"
 )
 
+file(GLOB Compute_BLOCK_OPT_SRC_FILES CONFIGURE_DEPENDS
+    "ComputeBlockOpt/*.cpp"
+)
+
 add_triton_library(DynamicCVPipeline
   AddDynamicCVPipeline.cpp
   PlanComputeBlock.cpp
+  ComputeBlockOptPass.cpp
   ${PLAN_COMPUTE_BLOCK_PASS_SRC}
   ${COMMON_SRC}
+  ${Compute_BLOCK_OPT_SRC_FILES}
   SplitDataflow.cpp
   SeparateMemoryFromComputePass.cpp
   AllocMultiCache.cpp

@@ -50,6 +50,7 @@ public:
     bool isWholeCubeReady(Operation *seedOp, llvm::DenseMap<Operation *, int> &indegree);
 
     llvm::LogicalResult markOpBlockId(Operation *op, int blockId);
+    void updateBlockId(Operation *op, int blockId);
 
     llvm::SmallVector<Operation *> getOpsByBlockId(int blockId);
     int getBlockIdByOp(Operation *op);

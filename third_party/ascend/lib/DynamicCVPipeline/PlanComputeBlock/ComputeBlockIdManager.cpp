@@ -78,6 +78,25 @@ llvm::LogicalResult ComputeBlockIdManager::markOpBlockId(Operation *op, int bloc
     return record(op, blockId);
 }
 
+void ComputeBlockIdManager::updateBlockId(Operation *op, int blockId)
+{
+
+    MLIRContext *ctx = op->getContext();
+    op->setAttr(kBlockId, IntegerAttr::get(IntegerType::get(ctx, blockIdWidth), blockId));
+    std::lock_guard<std::mutex> lock(managerMutex);
+    auto it = opToBlockId.find(op);
+    if (it != opToBlockId.end()) {
+        int preBlockId = it->second;
+        auto &vec = blockIdToOps[preBlockId];
+        auto vecIt = llvm::find(vec, op);  
+        if (vecIt != vec.end()) {
+            vec.erase(vecIt);
+        }
+    } 
+    opToBlockId[op] = blockId;
+    blockIdToOps[blockId].push_back(op);
+}
+
 llvm::SmallVector<Operation *> ComputeBlockIdManager::getOpsByBlockId(int blockId)
 {
     if (blockId == -1) {
