@@ -20,16 +20,30 @@
  * THE SOFTWARE.
  */
 
-#include "ascend/include/DynamicCVPipeline/PlanComputeBlock/OpClassifier.h"
+#include <queue>
 
 #include "llvm/ADT/DenseSet.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/Support/Casting.h"
 
-#include <queue>
+#include "mlir/Dialect/Arith/IR/Arith.h"
+#include "mlir/Dialect/Bufferization/IR/Bufferization.h"
+#include "mlir/Dialect/MemRef/IR/MemRef.h"
+#include "mlir/IR/BuiltinOps.h"
+#include "mlir/IR/BuiltinTypes.h"
+#include "mlir/Interfaces/CastInterfaces.h"
+#include "mlir/Interfaces/ViewLikeInterface.h"
+#include "mlir/Support/LLVM.h"
+
+#include "ascend/include/DynamicCVPipeline/PlanComputeBlock/OpClassifier.h"
+
+#include "bishengir/Dialect/Annotation/IR/Annotation.h"
 
 using namespace mlir;
 static constexpr const char *DEBUG_TYPE = "op-classifier";
 #define DBGS() (llvm::dbgs() << '[' << DEBUG_TYPE << "] ")
-#define LDBG(X) LLVM_DEBUG(DBGS() << (X) << "\n")
+#define LOG_DEBUG(...) LLVM_DEBUG(llvm::dbgs() << " [" << DEBUG_TYPE << "] " << __VA_ARGS__)
 using namespace mlir::triton;
 
 namespace {
@@ -347,7 +361,7 @@ void OpClassifierPass::matchMaterializePattern(Operation *user)
 // Pattern matching for CUBE operations
 int OpClassifierPass::patternMatchCUBE()
 {
-    LDBG("--- Step 1: pattern match --->\n");
+    LOG_DEBUG("--- Step 1: pattern match --->\n");
 
     for (Operation *op : allOps) {
         if (!isa<linalg::MatmulOp>(op))
@@ -464,6 +478,79 @@ int OpClassifierPass::propagateCubeUpstream()
     return 0;
 }
 
+constexpr size_t kMaxAliasCount = 2;
+
+static inline SmallVector<Value, kMaxAliasCount> getAliasingOperands(Operation *op)
+{
+    if (auto viewOp = llvm::dyn_cast<ViewLikeOpInterface>(op)) {
+        return {viewOp.getViewSource()};
+    }
+    if (isa<CastOpInterface, bufferization::ToMemrefOp, bufferization::ToTensorOp, annotation::MarkOp>(op)) {
+        return {op->getOperand(0)};
+    }
+    if (auto selectOp = llvm::dyn_cast<arith::SelectOp>(op)) {
+        return {selectOp.getTrueValue(), selectOp.getFalseValue()};
+    }
+
+    return {};
+}
+
+static bool collectToMemoryAllocation(Operation *op, llvm::SmallPtrSetImpl<Operation *> &out)
+{
+    if (out.contains(op)) {
+        LOG_DEBUG("Short circuited at: " << *op << "\n");
+        return true;
+    }
+
+    if (llvm::isa<memref::AllocOp>(op)) {
+        out.insert(op);
+        LOG_DEBUG("Succeeded at: " << *op << "\n");
+        return true;
+    }
+
+    auto tracedToAlloc = false;
+    auto upstreamAliases = getAliasingOperands(op);
+
+    if (upstreamAliases.empty()) {
+        LOG_DEBUG("Stopped at non-aliasing op: " << *op << "\n");
+    }
+
+    for (Value srcVal : upstreamAliases) {
+        if (auto *op = srcVal.getDefiningOp()) {
+            if (collectToMemoryAllocation(op, out)) {
+                tracedToAlloc = true;
+            }
+        }
+    }
+
+    if (!tracedToAlloc) {
+        LOG_DEBUG("Not marked as VECTOR_ONLY since op does not trace to alloc: " << *op << "\n");
+        return false;
+    }
+
+    out.insert(op);
+    return true;
+}
+
+void OpClassifierPass::markUpstreamsOfImplicitTranspose()
+{
+    static constexpr llvm::StringLiteral kMayImplicitTransposeWithLastAxis = "MayImplicitTransposeWithLastAxis";
+    static constexpr size_t kMaxExpectedAffected = 16;
+
+    auto module = getOperation();
+    llvm::SmallPtrSet<Operation *, kMaxExpectedAffected> affectedOps;
+    module.walk([&](annotation::MarkOp markOp) {
+        if (markOp.isAnnotatedBy(kMayImplicitTransposeWithLastAxis)) {
+            LOG_DEBUG("Tracing Upstream Of " << *markOp << "\n");
+            collectToMemoryAllocation(markOp, affectedOps);
+        }
+    });
+
+    for (auto *op : affectedOps) {
+        opCoreTypes[op] = OP_VECTOR_ONLY;
+    }
+}
+
 // ============================================================================
 // Step 3: Mark remaining operations as VECTOR
 // ============================================================================
@@ -490,6 +577,10 @@ int OpClassifierPass::markRemainingAsVector()
             opCoreTypes[op] = OP_VECTOR_ONLY;
         }
     }
+
+    // Special case: aliases of annotation.mark {MayImplicitTransposeWithLastAxis} to alloc should all be VECTOR_ONLY
+    markUpstreamsOfImplicitTranspose();
+
     return 0;
 }
 

@@ -101,6 +101,8 @@ private:
     // Step 3: Mark remaining operations as VECTOR
     int markRemainingAsVector();
 
+    void markUpstreamsOfImplicitTranspose();
+
     // Step 4: Propagate VECTOR core type upstream
     int propagateVectorUpstream();
 
