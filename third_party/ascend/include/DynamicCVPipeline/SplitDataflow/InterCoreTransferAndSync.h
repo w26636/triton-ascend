@@ -142,6 +142,8 @@ private:
 
 std::unique_ptr<OperationPass<ModuleOp>> createInterCoreTransferAndSyncPass();
 
+void registerInterCoreTransferAndSyncPasses();
+
 } // namespace triton
 } // namespace mlir
 

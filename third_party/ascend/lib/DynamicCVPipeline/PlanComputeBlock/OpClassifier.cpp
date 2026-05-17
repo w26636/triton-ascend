@@ -406,9 +406,6 @@ void OpClassifierPass::getUpstreamOpsWithMemoryDeps(Operation *cur, llvm::SmallV
     // Collect SSA dependencies (direct operands)
     for (Value operand : cur->getOperands()) {
         Operation *def = operand.getDefiningOp();
-        if (def && isa<memref::CopyOp, memref::AllocOp>(def) && opCoreTypes[def] == OP_CUBE_ONLY) {
-            continue;
-        }
         if (def && def != cur) {
             LLVM_DEBUG(DBGS() << "push op: " << *def << "\n");
             upstreamOps.push_back(def);
@@ -424,7 +421,7 @@ void OpClassifierPass::getUpstreamOpsWithMemoryDeps(Operation *cur, llvm::SmallV
         // Get operations that define memory used by current op
         for (Operation *memDef : memDepGraph->getMemDefs(cur)) {
             LLVM_DEBUG(DBGS() << "memDef: cur " << *cur << " -> memDef " << *memDef << "\n");
-            if (isa<memref::CopyOp>(memDef) && opCoreTypes[memDef] == OP_UNDETERMINED) {
+            if (isa<memref::CopyOp>(memDef)) {
                 LLVM_DEBUG(DBGS() << "push op: " << *memDef << "\n");
                 upstreamOps.push_back(memDef);
             }
