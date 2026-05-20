@@ -40,9 +40,7 @@ jobs:
     if: >-
       github.event_name == 'workflow_run' &&
       github.event.workflow_run.conclusion == 'success'
-    runs-on: linux-aarch64-cpu-2
-    container:
-      image: swr.cn-southwest-2.myhuaweicloud.com/modelfoundry/actions/actions-runner:latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       actions: read
@@ -115,9 +113,8 @@ jobs:
          needs.publish.result == 'success' &&
          needs.publish.outputs.pr_num != '')
       )
-    runs-on: linux-aarch64-cpu-2
-    container:
-      image: swr.cn-southwest-2.myhuaweicloud.com/modelfoundry/actions/actions-runner:latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
     permissions:
       pull-requests: write
       statuses: write

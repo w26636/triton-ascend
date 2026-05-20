@@ -8,9 +8,7 @@ on:
 
 jobs:
   prepare:
-    runs-on: linux-aarch64-cpu-2
-    container:
-      image: swr.cn-southwest-2.myhuaweicloud.com/modelfoundry/actions/actions-runner:latest
+    runs-on: ubuntu-latest
     outputs:
       matrix-ASCEND: ${{ steps.set-matrix.outputs.matrix-ASCEND }}
     steps:
@@ -93,7 +91,6 @@ jobs:
       - name: Prepare runner matrix
         id: set-matrix
         if: env.enable_integration == 'true'
-        shell: bash
         run: |
           if [ x"${{ github.repository }}" == x"triton-lang/triton-ascend" ]; then
             echo 'matrix-ASCEND=[{"name":"linux-aarch64-a3-4","runner_type":"linux-aarch64-a3-4","runs_on":["linux-aarch64-a3-4"],"chip_type":"a3"}]' >> $GITHUB_OUTPUT
