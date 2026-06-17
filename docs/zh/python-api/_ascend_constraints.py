@@ -51,6 +51,13 @@ CONSTRAINTS = {
         ],
         "example": "triton.extension.buffer.language.to_tensor",
     },
+    "triton.language.permute": {
+        "constraints": [
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
+        ],
+        "example":
+        "triton.language.permute",
+    },
     "triton.heuristics": {
         "example": "triton.heuristics",
     },
@@ -178,23 +185,22 @@ CONSTRAINTS = {
     },
     "triton.language.broadcast": {
         "constraints": [
-            "DataType: Ascend does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
         ],
         "example":
         "triton.language.broadcast",
     },
     "triton.language.broadcast_to": {
         "constraints": [
-            "DataType: Ascend does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
-            "输入tensor的shape和目标shape的rank必须一致",
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
+            "The rank of the input tensor's shape must match the rank of the target shape.",
         ],
         "example":
         "triton.language.broadcast_to",
     },
     "triton.language.cast": {
         "constraints": [
-            "DataType: Ascend does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
-            "``overflow_mode`` (Ascend extension): Ascend扩展参数，整数溢出处理模式（trunc/saturate），仅对整型有意义",
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
         ],
         "example":
         "triton.language.cast",
@@ -313,7 +319,7 @@ CONSTRAINTS = {
     },
     "triton.language.expand_dims": {
         "constraints": [
-            "DataType: Ascend does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
         ],
         "example":
         "triton.language.expand_dims",
@@ -482,9 +488,16 @@ CONSTRAINTS = {
         ],
         "example": "triton.language.insert_slice",
     },
+    "triton.language.interleave": {
+        "constraints": [
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
+        ],
+        "example":
+        "triton.language.interleave",
+    },
     "triton.language.join": {
         "constraints": [
-            "DataType: Ascend does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
         ],
         "example":
         "triton.language.join",
@@ -655,7 +668,7 @@ CONSTRAINTS = {
     },
     "triton.language.ravel": {
         "constraints": [
-            "DataType: Ascend does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
         ],
         "example":
         "triton.language.ravel",
@@ -670,8 +683,8 @@ CONSTRAINTS = {
     },
     "triton.language.reshape": {
         "constraints": [
-            "DataType: Ascend does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
-            "``can_reorder``: 仅支持False",
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
+            "``can_reorder``: Only supports False",
         ],
         "example":
         "triton.language.reshape",
@@ -710,7 +723,7 @@ CONSTRAINTS = {
     },
     "triton.language.split": {
         "constraints": [
-            "DataType: Ascend does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
         ],
         "example":
         "triton.language.split",
@@ -794,8 +807,8 @@ CONSTRAINTS = {
     },
     "triton.language.trans": {
         "constraints": [
-            "DataType: Ascend does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
-            "不支持维度高于8的转置",
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
+            "Transpose on dimensions greater than 8 is not supported.",
         ],
         "example":
         "triton.language.trans",
@@ -808,7 +821,7 @@ CONSTRAINTS = {
     },
     "triton.language.view": {
         "constraints": [
-            "DataType: Ascend does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
         ],
         "example":
         "triton.language.view",
