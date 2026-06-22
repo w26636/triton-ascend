@@ -92,15 +92,19 @@ CONSTRAINTS = {
     },
     "triton.language.argmax": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support fp64, uint16, uint32, uint64; Ascend 950 does not fp64, fp8e4(E4M3), fp8e5(E5M2) (hardware limitation).",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
         ],
-        "example": "triton.language.argmax",
+        "example":
+        "triton.language.argmax",
     },
     "triton.language.argmin": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support fp64, uint16, uint32, uint64; Ascend 950 does not fp64, fp8e4(E4M3), fp8e5(E5M2) (hardware limitation).",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
         ],
-        "example": "triton.language.argmin",
+        "example":
+        "triton.language.argmin",
     },
     "triton.language.associative_scan": {
         "constraints": [
@@ -579,8 +583,9 @@ CONSTRAINTS = {
     },
     "triton.language.max": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64 (hardware limitation).",
-            "``return_indices``: 当axis=None时不支持return_indices=True",
+            "DataType: Ascend A2/A3 does not support fp64, uint16, uint32, uint64; Ascend 950 does not fp64, fp8e4(E4M3), fp8e5(E5M2) (hardware limitation).",
+            "``return_indices``: return_indices=True is not supported when axis=None.",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
         ],
         "example":
         "triton.language.max",
@@ -611,8 +616,9 @@ CONSTRAINTS = {
     },
     "triton.language.min": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64 (hardware limitation).",
-            "``return_indices``: 当axis=None时不支持return_indices=True",
+            "DataType: Ascend A2/A3 does not support fp64, uint16, uint32, uint64; Ascend 950 does not fp64, fp8e4(E4M3), fp8e5(E5M2) (hardware limitation).",
+            "``return_indices``: return_indices=True is not supported when axis=None.",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
         ],
         "example":
         "triton.language.min",
@@ -693,8 +699,8 @@ CONSTRAINTS = {
     },
     "triton.language.reduce": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
-            "keep_dims=True需更多测试规格覆盖，目前已测3D dim=2情况下支持",
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64; Ascend 950 does not fp8e4(E4M3), fp8e5(E5M2) (hardware limitation).",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
         ],
         "example":
         "triton.language.reduce",
@@ -810,6 +816,14 @@ CONSTRAINTS = {
         ],
         "example": "triton.language.sub",
     },
+    "triton.language.sum": {
+        "constraints": [
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64.",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
+        ],
+        "example":
+        "triton.language.sum",
+    },
     "triton.language.sync_block_all": {
         "constraints": [
             "``mode``: 必须为 'all_cube'、'all_vector' 或 'all' 之一",
@@ -885,8 +899,8 @@ CONSTRAINTS = {
     },
     "triton.language.xor_sum": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
-            "keep_dims=True需更多测试规格覆盖，目前已测3D dim=2情况下支持",
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64; Ascend 950 does not fp8e4(E4M3), fp8e5(E5M2).",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
         ],
         "example":
         "triton.language.xor_sum",
