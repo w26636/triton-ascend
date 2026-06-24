@@ -13,9 +13,13 @@
 ---
 
 # Triton-Ascend
+
 Triton-Ascend is a Triton compilation framework built for the Ascend platform, aiming to enable Triton code to run efficiently on Ascend hardware. For details, see [Triton-Ascend](https://github.com/triton-lang/triton-ascend/blob/main/README.md).
+
 # Supported Tags and Dockerfile
+
 ## Tag specifications
+
 Tag follow the following format：<br/>
 `<triton-ascend version>-<chip series>-<OS>-<python version>`
 
@@ -27,8 +31,11 @@ Tag follow the following format：<br/>
 | python version        | py3.11                      | Python version            |
 
 ## Triton-Ascend Images
+
 ### Release 3.2.1
+
 #### Key Image Components
+
 | Components      | Version     |
 |-----------------|-------------|
 | Triton-Ascend   | 3.2.1       |
@@ -49,11 +56,11 @@ Tag follow the following format：<br/>
 | 3.2.1-950-ubuntu22.04-py3.11     | [Dockerfile](3.2.1-950-ubuntu22.04-py3.11/Dockerfile) | docker pull quay.io/ascend/triton:3.2.1-950-ubuntu22.04-py3.11     |
 | 3.2.1-950-openeuler24.03-py3.11  | [Dockerfile](3.2.1-950-openeuler24.03-py3.11/Dockerfile) | docker pull quay.io/ascend/triton:3.2.1-950-openeuler24.03-py3.11  |
 
-
-
 # Quick Start
+
 ## Running the Triton-Ascend Container
-```
+
+```bash
 # Assume that your NPU device model is A3, the device is installed in /dev/davinci1, and the NPU driver is installed in /usr/local/Ascend:
 docker run -u 0 -dit --shm-size=512g --name=triton-ascend_container --net=host --privileged \
 --security-opt seccomp=unconfined \
@@ -78,17 +85,22 @@ quay.io/ascend/triton:3.2.1-a3-ubuntu22.04-py3.11 \
 /bin/bash
 
 ```
+
 ## How to Build Locally?
+
 **arm64**
-```
+
+```bash
 docker build \
 --network host \
 --build-arg TARGETPLATFORM=linux/arm64 \
 -t triton:3.2.1-a3-ubuntun22.04-py3.11-aarch64 \
 -f Dockerfile .
 ```
+
 **x86_64**
-```
+
+```bash
 docker build \
 --network host \
 --build-arg TARGETPLATFORM=linux/amd64 \
@@ -97,14 +109,17 @@ docker build \
 ```
 
 ## How to Perform Secondary Development?
-```
+
+```bash
 # Using the triton-ascend image as the base image and adding user software to it.
 FROM quay.io/ascend/triton:3.2.1-a3-ubuntu22.04-py3.11
 RUN apt update -y && \
     apt install wget \
     ...
 ```
+
 # Supported hardware
+
 | Chip Series | Product Example                 | Architecture  |
 |-------------|---------------------------------|---------------|
 | Ascend 910b | Atlas 800T A2, Atlas 900 A2 PoD | ARM64, x86_64 |
@@ -112,5 +127,6 @@ RUN apt update -y && \
 | Ascend 950  | 950PR Series                    | ARM64, x86_64 |
 
 # License
+
 View the license information of the CANN, Torch-npu and Triton-Ascend software contained in the image. For details, visit [License](https://www.hiascend.com/en/software/protocol).<br/>
 As with all container images, the pre-installed software packages (such as Python and system libraries) may be subject to their own licenses.

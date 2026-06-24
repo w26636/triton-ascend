@@ -173,6 +173,7 @@ tl.load() 和 tl.store()
 | tile_mix_vector_loop                          | CV算子的一个优化项，当前vector可以切几份                        | 默认None；如 [2,4,8]，autotune中可配置                       |
 | tile_mix_cube_loop                            | CV算子一个优化项，当前cube可以切几份      | 默认None；如 [2,4,8]，autotune中可配置                      |
 | auto_blockify_size                            | TRITON_ALL_BLOCKS_PARALLEL优化项，用于指定扩展的左起第一个维度的大小。 | 默认1；如 [2,4,8]，autotune中可配置                       |
+| enable_auto_blockify                          | per-kernel 级别覆盖 `TRITON_ALL_BLOCKS_PARALLEL` 环境变量。显式设为 **true** 或 **false** 时，kernel 按该值生效（忽略环境变量）；未设置（None）时由环境变量决定。优先级：该选项 > 环境变量 > 关。编译期 blockify pass 与运行期 block-count cap 都按此解析后的值生效，二者永远一致。 | 默认 None；可取值 **true** / **false** / None。 |
 
 - 注：优化编译选项在ascend/backend/compiler.py代码中。
 - 注：CV算子表示该算子运算过程中既使用了AI Core又使用了Vector Core。

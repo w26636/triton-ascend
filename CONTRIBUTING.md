@@ -1,4 +1,4 @@
-# Triton Ascend Contribution Guide
+# Contribution Guide
 
 - [Getting Started](#getting-started.md)
 - [Developer Certificate of Origin (DCO)](#DCO.md)
@@ -23,7 +23,6 @@ git commit -s -m "your commit message"
 ```
 
 This will automatically add a line `Signed-off-by: Your Name <your.email@example.com>` at the end of your commit message, indicating that you certify the origin and authorization of the contribution.
-
 
 <h2 id="developer-guide.md">Developer Guide</h2>
 

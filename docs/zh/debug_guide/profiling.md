@@ -16,7 +16,7 @@ msProf工具用于采集和分析运行在昇腾AI处理器上算子的关键性
 msprof op --kernel-name=target_kernel_name --output=$HOME/projects/output python3 $HOME/projects/test_op.py
 ```
 
-以示范测试用例[03-layer-norm.py](../../../third_party/ascend/tutorials/03-layer-norm.py)为例(不指定--output时生成的数据文件保存在当前路径下)：
+以示范测试用例[03-layer-norm.py](../../../third_party/ascend/unittest/autotune_ut/03-layer-norm.py)为例(不指定--output时生成的数据文件保存在当前路径下)：
 
 ```python
 msprof op --kernel-name=_layer_norm_fwd_fused python3 03-layer-norm.py

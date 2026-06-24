@@ -1,4 +1,4 @@
-## Contributors
+# Contributors
 
 Every release of Triton-Ascend would not have been possible without the following contributors:
 

@@ -375,6 +375,17 @@ export TRITON_DEVICE_PRINT=1
 python your_program.py
 ```
 
+After running, the variable content printed by `tl.device_print` is displayed in the `HiIPU Print` block, as shown in the following example:
+
+```text
+-----------------------------------------------------------------------------
+---------------------------------HiIPU Print---------------------------------
+-----------------------------------------------------------------------------
+=> Vec 0
+ tmp2 after addition =:
+[1.000000,2.000000,3.000000,4.000000,5.000000,6.000000,7.000000,8.000000,9.000000,10.000000,11.000000,12.000000,13.000000,14.000000,15.000000,16.000000]
+```
+
 - Note: The print length is limited.
 The length of the tensor printed by `tl.device_print` is limited. When the tensor length exceeds a certain threshold, the output is truncated.
 

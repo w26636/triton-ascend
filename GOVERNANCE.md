@@ -1,4 +1,4 @@
-# Governance
+# Governance Mechanism
 
 ## Mission
 
@@ -10,18 +10,20 @@ As an important component of the Triton ecosystem, the Triton-Ascend project is 
 - **Contribution-Oriented**: Membership is based on individual capability and contribution, not tied to employers
 - **Community-Driven**: Encourage broad participation, respect diverse viewpoints, and reach consensus through discussion and voting
 
-## Governance Mechanism
+## Governance Structure
 
 Triton-Ascend is an open-source project under the Triton community, with role appointments ultimately decided by the Triton community. The project adopts a layered technical governance structure:
 
 ### Contributor
 
 **Responsibilities**:
+
 - Help new contributors integrate into the project
 - Handle and respond to community `Issues`
 - Review `RFCs` and code
 
 **Requirements**:
+
 - Complete at least one contribution
 - Continuously and actively participate in the project through submitting `Issues`, code reviews, code submissions, and participating in community activities
 
@@ -30,6 +32,7 @@ Triton-Ascend is an open-source project under the Triton community, with role ap
 ### Maintainer
 
 **Responsibilities**:
+
 - Define the project's vision and mission, shape technical direction, and ensure long-term success
 - Have code merge permissions, lead roadmap planning
 - Review community contributions and continuously improve code
@@ -39,6 +42,7 @@ Triton-Ascend is an open-source project under the Triton community, with role ap
 - Participate in community technical meetings, discuss and vote on technical direction, large-scale proposals, and `Release` matters
 
 **Requirements**:
+
 - Deep understanding of the Triton and Triton-Ascend codebase
 - Commitment to continuous code contribution, with capabilities in design, development, and PR review workflows
 - Actively participate in community code reviews, deliver at least one major feature, and maintain continuous high-quality contributions

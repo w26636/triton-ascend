@@ -144,6 +144,7 @@ tensor([0.8329, 1.0024, 1.3639,  ..., 1.0796, 1.0406, 1.5811], device='npu:0')
 tensor([0.8329, 1.0024, 1.3639,  ..., 1.0796, 1.0406, 1.5811], device='npu:0')
 The maximum difference between torch and triton is 0.0
 ```
+
 ## From GPU to NPU: Migrating Triton Examples
 
 Triton-Ascend maintains full syntax compatibility with the community Triton, requiring only changes to tensor device declarations and a few torch.cuda.* APIs to run existing GPU examples on Ascend NPU. Below is a complete migration process demonstrated through a typical vector addition test.
@@ -197,6 +198,7 @@ def test_add(SIZE, BLOCK_SIZE):
     output_torch = x + y
     assert_close(output, output_torch, rtol=1e-3, atol=1e-3)
 ```
+
 To migrate, simply replace the GPU-related APIs with their corresponding NPU versions. The mapping is as follows:
 
 | GPU Syntax                      | NPU Syntax                      |
@@ -241,9 +243,11 @@ def test_add(SIZE, BLOCK_SIZE):
 
     output_torch = x + y
     assert_close(output, output_torch, rtol=1e-3, atol=1e-3)
-```
+```bash
 After making the modifications, run the test case with `pytest`. Successful execution indicates a successful migration.
 ```
+
 pytest test_add.py
-```
+
+```bash
 If the `pytest` component is not installed, you can install it using `pip install pytest`.

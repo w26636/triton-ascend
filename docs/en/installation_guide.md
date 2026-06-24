@@ -59,7 +59,7 @@ Run the: [01-vector-add.py](https://github.com/triton-lang/triton-ascend/blob/ma
 
 If an output similar to the following is displayed, the environment is correctly configured:
 
-```
+```bash
     tensor([0.8329, 1.0024, 1.3639,  ..., 1.0796, 1.0406, 1.5811], device='npu:0')
     tensor([0.8329, 1.0024, 1.3639,  ..., 1.0796, 1.0406, 1.5811], device='npu:0')
     The maximum difference between torch and triton is 0.0
@@ -158,7 +158,7 @@ Before building, you need to install the required build dependencies as outlined
 
 We recommend completing the source installation of Triton-Ascend using the <a href="#auto-code-base">Quick Installation</a> method. If you have special requirements, such as no network access on the target machine, you can use <a href="#hand-code-base">Manual Installation</a> instead.
 
-#### System Requirements
+### System Requirements
 
 | Pytorch Version | Recommended GCC version | Recommended GLIBC version |
 |-------------------|----------------------|--------------------|
@@ -169,9 +169,9 @@ We recommend completing the source installation of Triton-Ascend using the <a hr
 
 <a id="code-require"></a>
 
-#### Dependencies
+### Dependencies
 
-##### Installing System Library Dependencies
+#### Installing System Library Dependencies
 
 Install zlib1g-dev, LLD and Clang. You can also install ccache to accelerate the build process.
 

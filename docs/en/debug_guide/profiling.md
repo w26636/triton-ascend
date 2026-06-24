@@ -8,7 +8,7 @@ Before performance optimization, you need to obtain accurate performance data, u
 
 The msProf performance analysis tool is used to collect and analyze key performance metrics of operators running on Ascend AI Processors. You can efficiently locate software and hardware performance bottlenecks of operators based on the output performance data, thereby enhancing the overall efficiency of operator performance analysis.
 
-- Note: The msProf tool depends on the msopprof executable file in the CANN package. The interface functions in this file are the same as those in msprof op. This file is provided by the CANN package and does not need to be installed separately. For details about common msProf commands, see [Common msProf Commands](https://www.hiascend.com/document/detail/zh/mindstudio/82RC1/ODtools/Operatordevelopmenttools/atlasopdev_16_0082.html).
+- Note: The msProf tool depends on the msprof executable file in the CANN package. The interface functions in this file are the same as those in msprof op. This file is provided by the CANN package and does not need to be installed separately. For details about common msProf commands, see [Common msProf Commands](https://www.hiascend.com/document/detail/zh/mindstudio/82RC1/ODtools/Operatordevelopmenttools/atlasopdev_16_0082.html).
 
 The following command is an example of collecting performance data of an operator on a board. You can flexibly combine and configure parameters as required. In the example, **--output** is an optional parameter for specifying the path for storing the collected performance data. **--kernel-name** is an optional parameter for specifying the performance data of a single kernel to be collected. If it is not specified, only the first operator scheduled during the program execution is collected. **$HOME/projects/test_op.py** is the executable script of the operator.
 
@@ -16,7 +16,7 @@ The following command is an example of collecting performance data of an operato
 msprof op --kernel-name=target_kernel_name --output=$HOME/projects/output python3 $HOME/projects/test_op.py
 ```
 
-The following uses the [03-layer-norm.py](../../../third_party/ascend/tutorials/03-layer-norm.py) test case as an example (the generated data file is saved in the current path when **if --output** is not specified):
+The following uses the [05-layer-norm.py](./../../../third_party/ascend/tutorials/05-layer-norm.py) test case as an example (the generated data file is saved in the current path when **if --output** is not specified):
 
 ```python
 msprof op --kernel-name=_layer_norm_fwd_fused python3 03-layer-norm.py

@@ -29,7 +29,7 @@ CONSTRAINTS = {
     },
     "triton.extension.buffer.language.fixpipe": {
         "constraints": [
-            "DataType: Operates on L0C to UB data movement (Ascend A5/Ascend hardware specific).",
+            "DataType: Operates on L0C to UB data movement (Ascend 950/Ascend hardware specific).",
             "Source must be the result of a dot (matrix multiply) operation.",
             "Destination must be a buffer with UB memory scope.",
         ],
@@ -66,9 +66,11 @@ CONSTRAINTS = {
     },
     "triton.language.abs": {
         "constraints": [
-            "DataType: Ascend does not support fp64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64.",
         ],
-        "example": "triton.language.abs",
+        "example":
+        "triton.language.abs",
     },
     "triton.language.add": {
         "constraints": [
@@ -78,108 +80,109 @@ CONSTRAINTS = {
     },
     "triton.language.advance": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
-            "仅允许通过调整order参数的顺序来表达转置语义，不能通过调整stride参数的顺序实现转置语义",
-            "与较复杂的循环和分支语句搭配使用可能出现编译问题",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "Compilation issues may arise when used with complex loops and branch statements."
         ],
         "example":
         "triton.language.advance",
     },
     "triton.language.arange": {
         "constraints": [
-            "DataType: Ascend does not support int32 (hardware limitation).",
-            "start和end必须大于等于0",
-            "end - start < 1048576 (TRITON_MAX_TENSOR_NUMEL)",
-            "start和end必须是编译时常量（tl.constexpr）",
-            "``output_type`` (Ascend extension): Ascend输出类型为uint16，GPU输出类型为int32",
-            "``relaxed_requirement`` (Ascend extension): CUDA要求range=(end-start)必须为2的幂次方，Ascend无此要求",
+            "Arguments must be tl.constexpr of uint or int type (int64 not supported).",
+            "start and end must be greater than or equal to 0.",
+            "end - start < 1048576 (TRITON_MAX_TENSOR_NUMEL), applicable to both NV and Ascend.",
+            "``relaxed_requirement`` (Ascend extension): CUDA requires range=(end-start) to be a power of 2, Ascend has no such requirement.",
         ],
         "example":
         "triton.language.arange",
     },
     "triton.language.argmax": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support fp64, uint16, uint32, uint64; Ascend 950 does not fp64, fp8e4(E4M3), fp8e5(E5M2) (hardware limitation).",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
         ],
-        "example": "triton.language.argmax",
+        "example":
+        "triton.language.argmax",
     },
     "triton.language.argmin": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support fp64, uint16, uint32, uint64; Ascend 950 does not fp64, fp8e4(E4M3), fp8e5(E5M2) (hardware limitation).",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
         ],
-        "example": "triton.language.argmin",
+        "example":
+        "triton.language.argmin",
     },
     "triton.language.associative_scan": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
-            "reverse=True要求tl.load加载数据时对齐，不能使用mask过滤多余数据索引",
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64 (hardware limitation).",
+            "reverse=True requires alignment when loading data with tl.load, and mask cannot be used to filter redundant data indices",
         ],
         "example":
         "triton.language.associative_scan",
     },
+    "triton.language.assume": {
+        "example": "triton.language.assume",
+    },
     "triton.language.atomic_add": {
         "constraints": [
-            "DataType: Ascend does not support fp64, int64 (hardware limitation).",
-            "``sem``: 只支持acq_rel",
-            "``scope``: 只支持gpu",
+            "DataType: Ascend does not support fp64 (hardware limitation).",
+            "``sem``: only support acq_rel",
+            "``scope``: only support gpu",
         ],
         "example":
         "triton.language.atomic_add",
     },
     "triton.language.atomic_and": {
         "constraints": [
-            "``sem``: 只支持acq_rel",
-            "``scope``: 只支持gpu",
+            "``sem``: only support acq_rel",
+            "``scope``: only support gpu",
         ],
         "example": "triton.language.atomic_and",
     },
     "triton.language.atomic_cas": {
         "constraints": [
-            "DataType: Ascend does not support bf16, fp64 (hardware limitation).",
-            "``sem``: 只支持acq_rel",
-            "``scope``: 只支持gpu",
+            "DataType: Ascend does not support fp64 (hardware limitation).",
+            "``sem``: only support acq_rel",
+            "``scope``: only support gpu",
         ],
         "example":
         "triton.language.atomic_cas",
     },
     "triton.language.atomic_max": {
         "constraints": [
-            "DataType: Ascend does not support int64 (hardware limitation).",
-            "``sem``: 只支持acq_rel",
-            "``scope``: 只支持gpu",
+            "``sem``: only support acq_rel",
+            "``scope``: only support gpu",
         ],
-        "example":
-        "triton.language.atomic_max",
+        "example": "triton.language.atomic_max",
     },
     "triton.language.atomic_min": {
         "constraints": [
-            "DataType: Ascend does not support int64 (hardware limitation).",
-            "``sem``: 只支持acq_rel",
-            "``scope``: 只支持gpu",
+            "``sem``: only support acq_rel",
+            "``scope``: only support gpu",
         ],
-        "example":
-        "triton.language.atomic_min",
+        "example": "triton.language.atomic_min",
     },
     "triton.language.atomic_or": {
         "constraints": [
-            "``sem``: 只支持acq_rel",
-            "``scope``: 只支持gpu",
+            "``sem``: only support acq_rel",
+            "``scope``: only support gpu",
         ],
         "example": "triton.language.atomic_or",
     },
     "triton.language.atomic_xchg": {
         "constraints": [
             "DataType: Ascend does not support fp64 (hardware limitation).",
-            "``sem``: 只支持acq_rel",
-            "``scope``: 只支持gpu",
+            "``sem``: only support acq_rel",
+            "``scope``: only support gpu",
         ],
         "example":
         "triton.language.atomic_xchg",
     },
     "triton.language.atomic_xor": {
         "constraints": [
-            "``sem``: 只支持acq_rel",
-            "``scope``: 只支持gpu",
+            "``sem``: only support acq_rel",
+            "``scope``: only support gpu",
         ],
         "example": "triton.language.atomic_xor",
     },
@@ -207,29 +210,30 @@ CONSTRAINTS = {
     },
     "triton.language.cat": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
-            "``can_reorder``: Ascend和GPU都只支持can_reorder=True",
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64 (hardware limitation).",
+            "``can_reorder``: Both Ascend and GPU only support can_reorder=True",
         ],
         "example":
         "triton.language.cat",
     },
     "triton.language.cdiv": {
         "constraints": [
-            "DataType: Ascend does not support bool, uint16, uint32, uint64, uint8 (hardware limitation).",
-            "输入范围：0~16777216",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/bool, \
+                Ascend 950 does not support bool.",
+            "Input Range: 0~16777216",
         ],
         "example":
         "triton.language.cdiv",
     },
     "triton.language.ceil": {
         "constraints": [
-            "DataType: Ascend does not support fp64 (hardware limitation).",
+            "DataType: Ascend A2/A3/950 does not support fp64.",
         ],
         "example": "triton.language.ceil",
     },
     "triton.language.clamp": {
         "constraints": [
-            "DataType: Ascend does not support fp64 (hardware limitation).",
+            "DataType: Ascend A2/A3/950 does not support fp64.",
         ],
         "example": "triton.language.clamp",
     },
@@ -250,27 +254,38 @@ CONSTRAINTS = {
     },
     "triton.language.cos": {
         "constraints": [
-            "DataType: Ascend does not support fp64 (hardware limitation).",
+            "DataType: Ascend A2/A3/950 does not support fp64.",
         ],
         "example": "triton.language.cos",
     },
     "triton.language.cumprod": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64 (hardware limitation).",
+            "reverse=True requires alignment when loading data with tl.load, and mask cannot be used to filter redundant data indices",
         ],
-        "example": "triton.language.cumprod",
+        "example":
+        "triton.language.cumprod",
     },
     "triton.language.cumsum": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64 (hardware limitation).",
+            "reverse=True requires alignment when loading data with tl.load, and mask cannot be used to filter redundant data indices",
         ],
-        "example": "triton.language.cumsum",
+        "example":
+        "triton.language.cumsum",
+    },
+    "triton.language.debug_barrier": {
+        "example": "triton.language.debug_barrier",
+    },
+    "triton.language.device_assert": {
+        "example": "triton.language.device_assert",
     },
     "triton.language.device_print": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
-            "device_print 只能打印参与运算的结果值，无法打印纯粹用于访存的 offset 变量（编译器优化掉）",
-            "特定情况下 device_print 会展开辅助 DMA 代码导致底层报错，功能优化中",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "``prefix``: the first argument must be a string prefix; omitting it causes a compilation error.",
+            "Set environment variable ``TRITON_DEVICE_PRINT=1`` to enable.",
         ],
         "example":
         "triton.language.device_print",
@@ -282,6 +297,10 @@ CONSTRAINTS = {
         ],
         "example":
         "triton.language.div",
+    },
+    "triton.language.div_rn": {
+        "constraints": [],
+        "example": "triton.language.div_rn",
     },
     "triton.language.dot_scaled": {
         "constraints": [
@@ -296,24 +315,25 @@ CONSTRAINTS = {
     },
     "triton.language.equal": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64.",
         ],
     },
     "triton.language.erf": {
         "constraints": [
-            "DataType: Ascend does not support fp64 (hardware limitation).",
+            "DataType: Ascend A2/A3/950 does not support fp64.",
         ],
         "example": "triton.language.erf",
     },
     "triton.language.exp": {
         "constraints": [
-            "DataType: Ascend does not support fp64 (hardware limitation).",
+            "DataType: Ascend A2/A3/950 does not support fp64.",
         ],
         "example": "triton.language.exp",
     },
     "triton.language.exp2": {
         "constraints": [
-            "DataType: Ascend does not support fp64 (hardware limitation).",
+            "DataType: Ascend A2/A3/950 does not support fp64.",
         ],
         "example": "triton.language.exp2",
     },
@@ -323,6 +343,12 @@ CONSTRAINTS = {
         ],
         "example":
         "triton.language.expand_dims",
+    },
+    "triton.language.fdiv": {
+        "constraints": [
+            "DataType: Ascend A2/A3/950 does not support fp64.",
+        ],
+        "example": "triton.language.fdiv",
     },
     "triton.language.extra.ascend.libdevice.index_select_simd": {
         "constraints": [
@@ -364,6 +390,41 @@ CONSTRAINTS = {
             "Intended for use within an al.scope context.",
         ],
         "example": "triton.language.extra.cann.extension.debug_barrier",
+    },
+    "triton.language.extra.cann.extension.extract_slice": {
+        "constraints": [
+            "DataType: Ascend does not support bool (hardware limitation).",
+        ],
+        "example": "triton.language.extra.cann.extension.extract_slice",
+    },
+    "triton.language.extra.cann.extension.get_element": {
+        "constraints": [
+            "DataType: Ascend does not support bool (hardware limitation).",
+        ],
+        "example": "triton.language.extra.cann.extension.get_element",
+    },
+    "triton.language.extra.cann.extension.insert_slice": {
+        "constraints": [
+            "DataType: Ascend does not support bool (hardware limitation).",
+        ],
+        "example": "triton.language.extra.cann.extension.insert_slice",
+    },
+    "triton.language.extra.cann.extension.multibuffer": {
+        "constraints": [
+            "only support bufferize equals 2.",
+        ],
+        "example": "triton.language.extra.cann.extension.multibuffer",
+    },
+    "triton.language.extra.cann.extension.parallel": {
+        "constraints": [
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "When using ``parallel`` as an iterator, the operations within the loop body must have no dependencies and no conflicts between them:",
+            "Memory access (load/store) operations can be executed in parallel.",
+            "Compute operations are allowed, but there must be no more than one compute operation. Multiple compute operations would produce intermediate UB buffers, which cannot be accessed in parallel.",
+        ],
+        "example":
+        "triton.language.extra.cann.extension.parallel",
     },
     "triton.language.extra.cann.extension.scope": {
         "constraints": [
@@ -418,12 +479,6 @@ CONSTRAINTS = {
         "example":
         "triton.language.extra.cann.extension.sync_block_wait",
     },
-    "triton.language.extract_slice": {
-        "constraints": [
-            "DataType: Ascend does not support bool (hardware limitation).",
-        ],
-        "example": "triton.language.extract_slice",
-    },
     "triton.language.flip": {
         "constraints": [
             "DataType: Ascend does not support fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
@@ -432,9 +487,15 @@ CONSTRAINTS = {
     },
     "triton.language.floor": {
         "constraints": [
-            "DataType: Ascend does not support fp64 (hardware limitation).",
+            "DataType: Ascend A2/A3/950 does not support fp64.",
         ],
         "example": "triton.language.floor",
+    },
+    "triton.language.fma": {
+        "constraints": [
+            "DataType: Ascend A2/A3/950 does not support fp64.",
+        ],
+        "example": "triton.language.fma",
     },
     "triton.language.floordiv": {
         "constraints": [
@@ -444,7 +505,7 @@ CONSTRAINTS = {
     },
     "triton.language.full": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64 (hardware limitation).",
         ],
         "example": "triton.language.full",
     },
@@ -454,39 +515,39 @@ CONSTRAINTS = {
         ],
         "example": "triton.language.gather",
     },
-    "triton.language.get_element": {
-        "constraints": [
-            "DataType: Ascend does not support bool (hardware limitation).",
-        ],
-        "example": "triton.language.get_element",
-    },
     "triton.language.greater_than": {
         "constraints": [
             "DataType: Ascend does not support fp64, uint16, uint32, uint64 (hardware limitation).",
         ],
     },
+    "triton.language.greater_equal": {
+        "constraints": [
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64.",
+        ],
+    },
     "triton.language.histogram": {
         "constraints": [
-            "当前triton3.2版本暂未支持mask参数",
-            "input输入范围限制在 [0, num_bins-1]",
+            "triton3.2 does not support mask",
+            "input range is limited to [0, num_bins-1]",
         ],
         "example": "triton.language.histogram",
     },
     "triton.language.inline_asm_elementwise": {
         "constraints": [
-            "DataType: Ascend does not support bf16, bool, fp16, fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
-            "内联汇编寄存器仅支持 int64(s64) 和 float32(f32)",
-            "约束限制仅支持 'l'（LLVM 约束）",
-            "目前仅支持输入一维张量，计算高维张量需展开",
+            "Inline assembly registers only support int64 (s64) and float32 (f32).",
+            "Only the 'l' LLVM constraint is supported.",
+            "Only 1-D input tensors are supported; higher-dimensional tensors must be flattened.",
         ],
         "example":
         "triton.language.inline_asm_elementwise",
     },
-    "triton.language.insert_slice": {
+    "triton.language.interleave": {
         "constraints": [
-            "DataType: Ascend does not support bool (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support fp64, fp8e4, fp8e5, uint16, uint32, uint64 (hardware limitation).",
         ],
-        "example": "triton.language.insert_slice",
+        "example":
+        "triton.language.interleave",
     },
     "triton.language.interleave": {
         "constraints": [
@@ -504,86 +565,100 @@ CONSTRAINTS = {
     },
     "triton.language.less_equal": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64.",
         ],
     },
     "triton.language.less_than": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64.",
         ],
     },
     "triton.language.load": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
-            "``cache_modifier``: has no effect on Ascend.",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "``cache_modifier``: Ascend A5 SIMT-only accepts the Triton upstream strings (``''``, ``'.ca'``, ``'.cg'``, ``'.cv'``); the backend folds them to a two-level cache / uncache mapping (``'.ca'`` -> cache, ``'.cg'`` / ``'.cv'`` -> uncache). Effective on global memory; ignored on shared memory. A2/A3 and non-SIMT-only paths ignore the modifier.",
             "``eviction_policy``: has no effect on Ascend.",
-            "``volatile``: has no effect on Ascend.",
-            "``padding_option``: is not supported on Ascend.",
-            "与分支、循环语句搭配使用时的泛化性问题，pointer和mask的计算过程涉及较复杂的循环和分支语句可能出现编译问题",
+            "``volatile``: ``bool``; on Ascend A5 SIMT-only, guarantees memory ordering and prevents the compiler/hardware from hoisting or eliding the load. Effective on both global and shared memory. A2/A3 and non-SIMT-only paths ignore the modifier.",
+            "Compatibility issues with branch and loop statements: \
+                Complex pointer and mask calculations involving branches or loops may cause compilation failures.",
         ],
         "example":
         "triton.language.load",
     },
     "triton.language.load_tensor_descriptor": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
-            "make_tensor_descriptor / load_tensor_descriptor / store_tensor_descriptor 需配套使用，不能与 tl.load() / tl.store() 混用",
-            "Triton 3.2.0 存在部分函数（如cast）的兼容性问题，建议升级至 3.4.0",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "`make_tensor_descriptor`, `load_tensor_descriptor` and `store_tensor_descriptor` \
+                must be used as a suite in Triton 3.2.x. Do not mix them with `tl.load()` or `tl.store()`.",
+            "Compatibility issues exist for certain functions (e.g. cast) in Triton 3.2.x."
         ],
         "example":
         "triton.language.load_tensor_descriptor",
     },
     "triton.language.log": {
         "constraints": [
-            "DataType: Ascend does not support fp64 (hardware limitation).",
+            "DataType: Ascend A2/A3/950 does not support fp64.",
         ],
         "example": "triton.language.log",
     },
     "triton.language.log2": {
         "constraints": [
-            "DataType: Ascend does not support fp64 (hardware limitation).",
+            "DataType: Ascend A2/A3/950 does not support fp64.",
         ],
         "example": "triton.language.log2",
     },
     "triton.language.make_block_ptr": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
-            "仅允许通过调整order参数的顺序来表达转置语义，不能通过调整stride参数的顺序实现转置语义",
-            "与分支、循环语句搭配使用时的泛化性问题",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "Transpose logic can only be implemented by adjusting the `order` parameter. \
+                Do not reorder strides to achieve transpose.",
+            "Compatibility issues may occur when used together with branch and loop statements."
         ],
         "example":
         "triton.language.make_block_ptr",
     },
     "triton.language.make_tensor_descriptor": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
-            "``strides``: 前面的维度必须是16字节的整数倍，最后一维必须是连续存储的",
-            "make_tensor_descriptor / load_tensor_descriptor / store_tensor_descriptor 需配套使用，不能与 tl.load() / tl.store() 混用",
-            "不支持padding_option入参",
-            "Triton 3.2.0 存在部分函数（如cast）的兼容性问题，建议升级至 3.4.0",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "`make_tensor_descriptor`, `load_tensor_descriptor` and `store_tensor_descriptor` \
+                must be used as a suite in Triton 3.2.x. Do not mix them with `tl.load()` or `tl.store()`.",
+            "Compatibility issues exist for certain functions (e.g. cast) in Triton 3.2.x."
         ],
         "example":
         "triton.language.make_tensor_descriptor",
     },
     "triton.language.max": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64 (hardware limitation).",
-            "``return_indices``: 当axis=None时不支持return_indices=True",
+            "DataType: Ascend A2/A3 does not support fp64, uint16, uint32, uint64; Ascend 950 does not fp64, fp8e4(E4M3), fp8e5(E5M2) (hardware limitation).",
+            "``return_indices``: return_indices=True is not supported when axis=None.",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
         ],
         "example":
         "triton.language.max",
     },
     "triton.language.max_constancy": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "``values``: rank must match the rank of ``input`` (e.g. ``[1, 1]`` for a 2-D input).",
         ],
-        "example": "triton.language.max_constancy",
+        "example":
+        "triton.language.max_constancy",
     },
     "triton.language.max_contiguous": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "``values``: rank must match the rank of ``input`` (e.g. ``[1, 1]`` for a 2-D input).",
         ],
-        "example": "triton.language.max_contiguous",
+        "example":
+        "triton.language.max_contiguous",
     },
     "triton.language.maximum": {
         "constraints": [
@@ -593,8 +668,9 @@ CONSTRAINTS = {
     },
     "triton.language.min": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64 (hardware limitation).",
-            "``return_indices``: 当axis=None时不支持return_indices=True",
+            "DataType: Ascend A2/A3 does not support fp64, uint16, uint32, uint64; Ascend 950 does not fp64, fp8e4(E4M3), fp8e5(E5M2) (hardware limitation).",
+            "``return_indices``: return_indices=True is not supported when axis=None.",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
         ],
         "example":
         "triton.language.min",
@@ -613,55 +689,39 @@ CONSTRAINTS = {
         "example":
         "triton.language.mod",
     },
+    "triton.language.multiple_of": {
+        "constraints": [
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "``values``: describes the divisibility of the first value along each dimension, so its rank must match ``input`` (e.g. ``[1, 1]`` for a 2-D input).",
+        ],
+        "example":
+        "triton.language.multiple_of",
+    },
     "triton.language.neg": {
         "constraints": [
             "DataType: Ascend does not support bool, fp64, uint16, uint32, uint64 (hardware limitation).",
         ],
         "example": "triton.language.neg",
     },
-    "triton.language.parallel": {
-        "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
-            "``bind_sub_block``: bind_sub_block 为 True 时在 IR 中是否能体现与 range 的差异，功能是否实现待验证",
-        ],
-        "example":
-        "triton.language.parallel",
-    },
     "triton.language.rand": {
-        "constraints": [
-            "seed 参数不支持 fp16/fp32/fp64/bf16 类型，仅支持整数和 bool 类型",
-            "相对社区能力暂不支持（具体差异待补充）",
-        ],
         "example": "triton.language.rand",
     },
     "triton.language.randint": {
-        "constraints": [
-            "seed 参数不支持 fp16/fp32/fp64/bf16 类型，仅支持整数和 bool 类型",
-            "相对社区能力暂不支持（具体差异待补充）",
-        ],
         "example": "triton.language.randint",
     },
     "triton.language.randint4x": {
-        "constraints": [
-            "seed 参数不支持 fp16/fp32/fp64/bf16 类型，仅支持整数和 bool 类型",
-            "相对社区能力暂不支持（具体差异待补充）",
-        ],
         "example": "triton.language.randint4x",
     },
     "triton.language.randn": {
-        "constraints": [
-            "seed 参数不支持 fp16/fp32/fp64/bf16 类型，仅支持整数和 bool 类型",
-            "相对社区能力暂不支持（具体差异待补充）",
-        ],
         "example": "triton.language.randn",
     },
     "triton.language.range": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64, uint8 (hardware limitation).",
-            "``disallow_acc_multi_buffer``: Ascend 上相关功能不全",
-            "``flatten``: Ascend 上相关功能不全",
-            "``warp_specialize``: 仅 Blackwell GPU 支持，Ascend 无效",
-            "``disable_licm``: Ascend 上相关功能不全",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "``disallow_acc_multi_buffer``, ``flatten``, ``disable_licm``: related functionality is incomplete on Ascend.",
+            "``warp_specialize``: only supported on Blackwell GPU; has no effect on Ascend.",
         ],
         "example":
         "triton.language.range",
@@ -675,8 +735,8 @@ CONSTRAINTS = {
     },
     "triton.language.reduce": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
-            "keep_dims=True需更多测试规格覆盖，目前已测3D dim=2情况下支持",
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64; Ascend 950 does not fp8e4(E4M3), fp8e5(E5M2) (hardware limitation).",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
         ],
         "example":
         "triton.language.reduce",
@@ -710,16 +770,23 @@ CONSTRAINTS = {
     "triton.language.softmax": {
         "constraints": [
             "DataType: Ascend does not support fp64 (hardware limitation).",
-            "``ieee_rounding``: Ascend 不使用 PTX 精确舍入，该参数无效",
+            "``ieee_rounding``: Ascend does not use PTX precise rounding, this parameter is invalid.",
         ],
         "example":
         "triton.language.softmax",
     },
     "triton.language.sort": {
         "constraints": [
+            "Note: tl.sort may have precision problems in big shape or multidimensional shape, more recommendeded to use triton.language.extra.cann.extension.sort."
+        ],
+        "example":
+        "triton.language.sort",
+    },
+    "triton.language.extra.cann.extension.sort": {
+        "constraints": [
             "DataType: Ascend does not support bool, fp64, int32, int64, uint8 (hardware limitation).",
         ],
-        "example": "triton.language.sort",
+        "example": "triton.language.extra.cann.extension.sort",
     },
     "triton.language.split": {
         "constraints": [
@@ -736,28 +803,65 @@ CONSTRAINTS = {
     },
     "triton.language.static_print": {
         "constraints": [
-            "DataType: Ascend does not support fp64, uint16, uint32, uint64, uint8 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
         ],
-        "example": "triton.language.static_print",
+        "example":
+        "triton.language.static_print",
+    },
+    "triton.language.static_assert": {
+        "constraints": [
+            "``cond``: must be a compile-time constant (tl.constexpr); a non-constant condition causes a compilation error.",
+        ],
+        "example":
+        "triton.language.static_assert",
     },
     "triton.language.static_range": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64, uint8 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "``start``, ``end``, ``step`` must be compile-time constants (tl.constexpr).",
         ],
-        "example": "triton.language.static_range",
+        "example":
+        "triton.language.static_range",
     },
-    "triton.language.store": {},
+    "triton.language.store": {
+        "constraints": [
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "``cache_modifier``: Ascend A5 SIMT-only accepts the Triton upstream strings (``''``, ``'.wb'``, ``'.cg'``, ``'.cs'``, ``'.wt'``); the backend folds them to a two-level cache / uncache mapping (``'.wb'`` -> cache, ``'.cg'`` / ``'.cs'`` / ``'.wt'`` -> uncache). Effective on global memory; ignored on shared memory. A2/A3 and non-SIMT-only paths ignore the modifier.",
+            "``eviction_policy``: has no effect on Ascend.",
+            "``volatile``: not accepted (the Triton upstream ``tl.store`` signature does not expose a ``volatile=`` keyword).",
+            "Compatibility issues with branch and loop statements: \
+                Complex pointer and mask calculations involving branches or loops may cause compilation failures.",
+        ],
+        "example":
+        "triton.language.store",
+    },
     "triton.language.store_tensor_descriptor": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16/uint32/uint64/fp64, \
+                Ascend 950 does not support fp64 (hardware limitation).",
+            "`make_tensor_descriptor`, `load_tensor_descriptor` and `store_tensor_descriptor` \
+                must be used as a suite in Triton 3.2.x. Do not mix them with `tl.load()` or `tl.store()`.",
+            "Compatibility issues exist for certain functions (e.g. cast) in Triton 3.2.x."
         ],
-        "example": "triton.language.store_tensor_descriptor",
+        "example":
+        "triton.language.store_tensor_descriptor",
     },
     "triton.language.sub": {
         "constraints": [
             "Ascend A3 对比 GPU 不支持 fp64",
         ],
         "example": "triton.language.sub",
+    },
+    "triton.language.sum": {
+        "constraints": [
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64.",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
+        ],
+        "example":
+        "triton.language.sum",
     },
     "triton.language.sync_block_all": {
         "constraints": [
@@ -785,25 +889,11 @@ CONSTRAINTS = {
             "``note`` (Ascend extension): Ascend Cube-Vector 架构同步原语，上游 Triton 不存在",
         ],
     },
-    "triton.language.tensor.__invert__": {
-        "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
-        ],
-    },
-    "triton.language.tensor.__neg__": {
-        "constraints": [
-            "DataType: Ascend does not support bool, fp64, uint16, uint32, uint64 (hardware limitation).",
-        ],
-    },
     "triton.language.tensor.logical_and": {
-        "constraints": [
-            "DataType: Ascend does not support fp64 (hardware limitation).",
-        ],
+        "constraints": [],
     },
     "triton.language.tensor.logical_or": {
-        "constraints": [
-            "DataType: Ascend does not support fp64 (hardware limitation).",
-        ],
+        "constraints": [],
     },
     "triton.language.trans": {
         "constraints": [
@@ -834,22 +924,62 @@ CONSTRAINTS = {
     },
     "triton.language.xor_sum": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
-            "keep_dims=True需更多测试规格覆盖，目前已测3D dim=2情况下支持",
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64; Ascend 950 does not fp8e4(E4M3), fp8e5(E5M2).",
+            "``keep_dims=True`` requires more test coverage; currently verified for 3D tensor with dim=2.",
         ],
         "example":
         "triton.language.xor_sum",
     },
     "triton.language.zeros": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64 (hardware limitation).",
         ],
         "example": "triton.language.zeros",
     },
     "triton.language.zeros_like": {
         "constraints": [
-            "DataType: Ascend does not support uint16, uint32, uint64 (hardware limitation).",
+            "DataType: Ascend A2/A3 does not support uint16, uint32, uint64 (hardware limitation).",
         ],
         "example": "triton.language.zeros_like",
+    },
+    "triton.language.extra.cann.extension.index_put": {
+        "constraints": [
+            "Only supported on Ascend 950.",
+            "``ptr.dtype``: only supports float16, bfloat16, float32.",
+            "``ptr`` and ``value`` must have the same rank.",
+            "``index``: must be an integer tensor. If ``index.rank`` != 1, it will be reshaped to 1D.",
+            "``index.numel``: must equal ``value.shape[dim]``.",
+            "``value``: supports 2~5D tensors.",
+            "``dim``: must satisfy 0 <= dim < rank(value) - 1.",
+        ],
+        "example":
+        "triton.language.extra.cann.extension.index_put",
+    },
+    "triton.language.extra.cann.extension.gather_out_to_ub": {
+        "constraints": [
+            "Only supported on Ascend 950.",
+            "``src.dtype``: only supports float16, bfloat16, float32.",
+            "``src`` and ``index`` must have the same rank.",
+            "``index``: must be an integer tensor, with rank in [1, 5].",
+            "``dim``: must satisfy 0 <= dim < rank(index).",
+            "``other``: must be a scalar value.",
+            "For every dimension ``i`` not equal to ``dim``, ``index.size[i]`` <= ``src.size[i]``.",
+            "The output shape is the same as ``index.shape``.",
+        ],
+        "example":
+        "triton.language.extra.cann.extension.gather_out_to_ub",
+    },
+    "triton.language.extra.cann.extension.scatter_ub_to_out": {
+        "constraints": [
+            "Only supported on Ascend 950.",
+            "``ptr.dtype``: only supports float16, bfloat16, float32.",
+            "``ptr``, ``index`` and ``value`` must have the same rank.",
+            "``index``: must be an integer tensor, with rank in [1, 5].",
+            "``dim``: must satisfy 0 <= dim < rank(index).",
+            "For every dimension ``i`` not equal to ``dim``, ``index.size[i]`` <= ``ptr.size[i]``.",
+            "The output shape is the same as ``index.shape``.",
+        ],
+        "example":
+        "triton.language.extra.cann.extension.scatter_ub_to_out",
     },
 }

@@ -16,10 +16,12 @@ Certain interfaces automatically add additional processing logic under specific 
 When setting `propagate_nan=tl.PropagateNAN.NONE`, the system automatically adds NaN value detection and processing logic.
 
 **Impact:**
+
 - Significantly increases UB space usage
 - May cause performance degradation
 
 **Solutions:**
+
 - If input data does not contain NaN values or strict NaN processing semantics are not required, consider adjusting the `propagate_nan` parameter value
 - In scenarios with limited UB space, prioritize parameter configurations that do not trigger additional NaN processing
 
@@ -29,6 +31,7 @@ When setting `propagate_nan=tl.PropagateNAN.NONE`, the system automatically adds
 The kernel defines a large number of temporary tensors or intermediate computation results.
 
 **Solutions:**
+
 - Reduce unnecessary intermediate variables
 - Reuse allocated buffers
 - Split large computations into multiple smaller kernels
@@ -39,6 +42,7 @@ The kernel defines a large number of temporary tensors or intermediate computati
 Using larger data types such as fp64, bf16, or processing high-dimensional/large shape tensors.
 
 **Solutions:**
+
 - Consider splitting large tensors into blocks for processing
 - Modify blocking strategies to reduce the size of each block
 - Use smaller data types (e.g., fp16 instead of fp32) while meeting precision requirements
@@ -49,6 +53,7 @@ Using larger data types such as fp64, bf16, or processing high-dimensional/large
 The kernel contains complex conditional statements or multi-level nested loops.
 
 **Solutions:**
+
 - Simplify control flow logic
 - Reduce loop nesting levels or iteration counts
 - Split complex logic into multiple kernels

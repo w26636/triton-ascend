@@ -1,4 +1,4 @@
-## Maintainers
+# Maintainers
 
 | Name | ID | Join Date |
 |---|---|---|
