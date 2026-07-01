@@ -33,12 +33,10 @@ jobs:
           allowed_files=(
             ".readthedocs.yaml"
             "CONTRIBUTING.md"
-            "CONTRIBUTING_zh.md"
             "README.md"
             "README_zh.md"
             "RELEASE.md"
             "SECURITYNOTE.md"
-            "SECURITYNOTE_zh.md"
             "requirements.txt"
             "requirements_dev.txt"
             "safe_compile.cmake"

@@ -2631,9 +2631,9 @@ def reduce(input, axis, combine_fn, keep_dims=False, _semantic=None, _generator=
     ret = _semantic.reduction(input, axis, make_combine_region)
     if keep_dims:
         if axis is not None:
-            ret = builtins.tuple(expand_dims(t, axis, _semantic=_semantic) for t in ret)
+            ret = tuple(expand_dims(t, axis, _semantic=_semantic) for t in ret)
         else:
-            ret = builtins.tuple(expand_ndims(t, len(input[0].shape)) for t in ret)
+            ret = tuple(expand_ndims(t, len(input[0].shape)) for t in ret)
     return ret
 
 

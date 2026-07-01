@@ -539,9 +539,6 @@ def linalg_to_bin_enable_npu_compile_910_95(linalg: str, metadata, opt):
         if mix_mode in ["aic"]:
             _compile_option_list += ["--disable-hfusion-vectorize=true"]
 
-        if opt.debug:
-            _compile_option_list += ["--bishengir-print-ir-after=hivm-graph-sync-solver"]
-
         compile_mode = _validate_compile_mode(metadata.get("compile_mode", "simd"))
         if compile_mode == "simd_simt":
             _compile_option_list += ["--enable-simd-simt-mix-compile"]
@@ -752,10 +749,6 @@ def linalg_to_bin_enable_npu_compile_A2_A3(linalg: str, metadata, opt):
                 bishengir_hivm_opt,
                 "--enable-triton-kernel-compile=true",
             ]
-
-        if opt.debug:
-            _compile_option_list += ["--mlir-print-ir-after-failure"]
-            _compile_option_list += ["--bishengir-print-ir-after=hivm-graph-sync-solver"]
 
         cmd_list = ([npu_compiler_path, ttadapter_path] + _compile_option_list + ["-o", bin_file])
 

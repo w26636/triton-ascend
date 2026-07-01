@@ -96,8 +96,10 @@ Triton Ascend
     :maxdepth: 1
     :caption: 社区治理
 
+    community/CODE_OF_CONDUCT_zh.md
     community/GOVERNANCE_zh.md
     community/community_technical_meeting.md
     community/release_policy.md
     community/MAINTAINERS.md
     community/contributor.md
+    community/SECURITYNOTE_zh.md
