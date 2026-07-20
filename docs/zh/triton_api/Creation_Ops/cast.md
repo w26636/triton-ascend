@@ -2,19 +2,18 @@
 
 ## 1 功能作用说明
 
-将张量转换为指定的数据类型，支持数值类型转换、位级别重解释（bitcast）、浮点降精度舍入模式，以及Ascend扩展的整数溢出处理模式。
+将张量转换为指定的数据类型，支持数值类型转换、位级别重解释（bitcast）、浮点降精度舍入模式。
 
 **语法：**
 
-- `triton.language.cast(input, dtype, fp_downcast_rounding=None, bitcast=False, overflow_mode=None)` - 函数调用形式
-- `input.cast(dtype, fp_downcast_rounding=None, bitcast=False, overflow_mode=None)` - 成员函数形式
+- `triton.language.cast(input, dtype, fp_downcast_rounding=None, bitcast=False)` - 函数调用形式
+- `input.cast(dtype, fp_downcast_rounding=None, bitcast=False)` - 成员函数形式
 
 **功能：**
 
 - 数值类型转换：整型<->整型、浮点<->浮点、整型<->浮点
 - 位级别重解释（bitcast）：不改变比特，只改变解释类型
 - 浮点降精度支持舍入模式：`rtne`（默认，四舍六入五成双）、`rtz`（向零）
-- 整数转换（Ascend 扩展）支持溢出模式：`trunc`（截断，默认）、`saturate`（饱和）
 
 ## 2 参数规格
 
@@ -26,7 +25,6 @@
 | dtype | tl.dtype | 是 | 目标数据类型 |
 | fp_downcast_rounding | str | 否 | 仅对浮点降精度有效，`rtne` 或 `rtz` |
 | bitcast | bool | 否 | 是否执行位级别重解释，默认 False |
-| overflow_mode | str | 否 | Ascend 扩展：整数溢出处理，`trunc` 或 `saturate` |
 
 **返回值：**
 
@@ -39,7 +37,6 @@
 
 - `fp_downcast_rounding` 仅在浮点降精度时可设置，否则将报错
 - `bitcast=True` 时不进行数值转换，忽略舍入/溢出模式
-- `overflow_mode` 仅对整型有意义（Ascend 扩展）
 
 ### 2.2 DataType支持表
 
@@ -93,10 +90,7 @@ def cast_advanced_example():
     # 浮点降精度，向零舍入
     z = x.cast(tl.float16, fp_downcast_rounding="rtz")
 
-    # 整数转换，饱和模式（Ascend扩展）
-    w = x.cast(tl.int8, overflow_mode="saturate")
-
-    return y, z, w
+    return y, z
 ```
 
 **实际应用场景：**
@@ -108,7 +102,7 @@ def quantization_kernel(x_ptr, output_ptr, scale, zero_point, M, N, BLOCK_M: tl.
     x = tl.load(x_ptr + offsets, mask=mask)
 
     # 量化：转换为int8
-    x_quantized = tl.cast(x * scale + zero_point, tl.int8, overflow_mode="saturate")
+    x_quantized = tl.cast(x * scale + zero_point, tl.int8)
 
     # 存储量化结果
     tl.store(output_ptr + offsets, x_quantized, mask=mask)
